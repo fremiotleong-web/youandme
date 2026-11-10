@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8f5">
+  <meta name="description" content="You&Me — prenez le temps de créer une vraie connexion, à votre rythme.">
+  <title>You&amp;Me — Les belles histoires commencent ici</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #302326;
+      --muted: #76666a;
+      --rose: #d86f78;
+      --rose-dark: #b94f5d;
+      --cream: #fff8f5;
+      --peach: #f9e4dc;
+      --white: #fff;
+      --line: #f0dfda;
+      --shadow: 0 24px 70px rgba(87, 47, 53, .12);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+    a { color: inherit; }
+    .wrap { width: min(1120px, calc(100% - 48px)); margin-inline: auto; }
+    header { padding: 22px 0; }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .logo { font-size: 1.45rem; font-weight: 800; letter-spacing: -.06em; text-decoration: none; }
+    .logo span { color: var(--rose); }
+    .nav-links { display: flex; align-items: center; gap: 30px; }
+    .nav-links a { color: var(--muted); font-size: .94rem; text-decoration: none; }
+    .nav-links a:hover { color: var(--rose-dark); }
+    .button {
+      display: inline-flex; min-height: 48px; align-items: center; justify-content: center;
+      padding: 0 22px; border: 0; border-radius: 999px; background: var(--rose);
+      color: var(--white); font-weight: 700; text-decoration: none; transition: transform .2s, background .2s;
+    }
+    .button:hover { background: var(--rose-dark); transform: translateY(-2px); }
+    .button.secondary { background: var(--white); color: var(--ink); box-shadow: 0 8px 24px rgba(87,47,53,.08); }
+    .hero { display: grid; grid-template-columns: 1.05fr .95fr; align-items: center; gap: 56px; padding: 66px 0 92px; }
+    .eyebrow { display: inline-flex; gap: 8px; align-items: center; color: var(--rose-dark); font-size: .83rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { max-width: 650px; margin: 17px 0 20px; font-size: clamp(3rem, 6vw, 5.3rem); line-height: .99; letter-spacing: -.065em; }
+    h1 em { color: var(--rose); font-style: normal; }
+    .hero-copy { max-width: 520px; color: var(--muted); font-size: 1.13rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 30px; }
+    .note { margin-top: 18px; color: #958489; font-size: .85rem; }
+    .art { position: relative; min-height: 440px; display: grid; place-items: center; }
+    .art-blob { position: absolute; width: min(420px, 90%); aspect-ratio: 1; border-radius: 47% 53% 62% 38% / 47% 40% 60% 53%; background: linear-gradient(145deg, #f8d4cd, #f5e1d3); transform: rotate(-8deg); }
+    .photo-card { position: relative; width: min(300px, 72%); min-height: 365px; display: flex; flex-direction: column; justify-content: end; overflow: hidden; padding: 25px; border: 9px solid rgba(255,255,255,.82); border-radius: 150px 150px 28px 28px; background: radial-gradient(circle at 50% 30%, #ffe9db 0 13%, transparent 13.5%), radial-gradient(ellipse at 50% 76%, #a95462 0 20%, transparent 20.5%), radial-gradient(ellipse at 35% 74%, #d99184 0 17%, transparent 17.5%), linear-gradient(150deg, #f5b5a9, #f7d8c8 48%, #e8a88f); box-shadow: var(--shadow); text-align: center; }
+    .photo-card::before, .photo-card::after { position: absolute; top: 45px; width: 130px; height: 245px; border-radius: 90px 90px 20px 20px; content: ""; opacity: .8; }
+    .photo-card::before { left: 18px; background: linear-gradient(#68454b 0 24%, #dca090 24% 100%); transform: rotate(-12deg); }
+    .photo-card::after { right: 18px; background: linear-gradient(#49383d 0 22%, #f0b5a2 22% 100%); transform: rotate(12deg); }
+    .card-label { position: relative; z-index: 1; padding: 10px 12px; border-radius: 14px; background: rgba(255,255,255,.86); font-size: .86rem; font-weight: 700; }
+    .floating { position: absolute; display: grid; place-items: center; border-radius: 20px; background: var(--white); box-shadow: var(--shadow); }
+    .heart { top: 66px; right: 5%; width: 66px; height: 66px; color: var(--rose); font-size: 2rem; transform: rotate(9deg); }
+    .spark { bottom: 56px; left: 3%; width: 54px; height: 54px; color: #cb8e53; font-size: 1.6rem; transform: rotate(-10deg); }
+    section { padding: 76px 0; }
+    .section-heading { max-width: 620px; margin: 0 auto 42px; text-align: center; }
+    .section-heading h2 { margin: 10px 0 12px; font-size: clamp(2rem, 4vw, 3.15rem); line-height: 1.08; letter-spacing: -.05em; }
+    .section-heading p { margin: 0; color: var(--muted); }
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .feature { padding: 28px; border: 1px solid var(--line); border-radius: 22px; background: rgba(255,255,255,.75); }
+    .icon { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 15px; background: var(--peach); font-size: 1.35rem; }
+    .feature h3 { margin: 19px 0 8px; font-size: 1.12rem; }
+    .feature p { margin: 0; color: var(--muted); font-size: .95rem; }
+    .cta { padding: 58px 25px; border-radius: 30px; background: #f5e5df; text-align: center; }
+    .cta h2 { margin: 0 auto 12px; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.08; letter-spacing: -.05em; }
+    .cta p { max-width: 560px; margin: 0 auto 24px; color: var(--muted); }
+    footer { padding: 30px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: .88rem; }
+    .footer-row { display: flex; justify-content: space-between; gap: 20px; align-items: center; }
+    .footer-row p { margin: 0; }
+    @media (max-width: 760px) {
+      .wrap { width: min(100% - 34px, 560px); }
+      .nav-links { gap: 14px; }
+      .nav-links a:not(.button) { display: none; }
+      .nav-links .button { min-height: 42px; padding-inline: 16px; font-size: .88rem; }
+      .hero { grid-template-columns: 1fr; gap: 12px; padding: 48px 0 52px; }
+      .art { min-height: 370px; }
+      .photo-card { min-height: 320px; }
+      .features { grid-template-columns: 1fr; }
+      section { padding: 58px 0; }
+      .footer-row { flex-direction: column; align-items: flex-start; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav wrap" aria-label="Navigation principale">
+      <a class="logo" href="#accueil" aria-label="You&Me, accueil">You<span>&amp;</span>Me</a>
+      <div class="nav-links">
+        <a href="#decouvrir">Notre approche</a>
+        <a href="#valeurs">Nos valeurs</a>
+        <a class="button" href="#commencer">Découvrir</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero wrap" id="accueil">
+      <div>
+        <span class="eyebrow">♡ Une belle histoire, à votre rythme</span>
+        <h1>La vraie rencontre commence <em>par vous.</em></h1>
+        <p class="hero-copy">You&amp;Me vous invite à prendre le temps de découvrir l’autre, de partager ce qui compte et de créer une connexion sincère.</p>
+        <div class="actions">
+          <a class="button" href="#decouvrir">Découvrir You&amp;Me&nbsp; <span aria-hidden="true">→</span></a>
+          <a class="button secondary" href="#valeurs">Notre philosophie</a>
+        </div>
+        <p class="note">De belles conversations. Aucune précipitation.</p>
+      </div>
+      <div class="art" aria-label="Illustration de deux personnes qui se rapprochent" role="img">
+        <div class="art-blob"></div>
+        <div class="photo-card"><span class="card-label">Une connexion qui vous ressemble</span></div>
+        <div class="floating heart" aria-hidden="true">♥</div>
+        <div class="floating spark" aria-hidden="true">✦</div>
+      </div>
+    </section>
+
+    <section id="decouvrir">
+      <div class="wrap">
+        <div class="section-heading">
+          <span class="eyebrow">Faire connaissance autrement</span>
+          <h2>Moins de pression.<br>Plus de connexion.</h2>
+          <p>Les plus belles histoires se construisent avec authenticité, curiosité et un peu de temps.</p>
+        </div>
+        <div class="features" id="valeurs">
+          <article class="feature">
+            <div class="icon" aria-hidden="true">♡</div>
+            <h3>Restez vous-même</h3>
+            <p>Les liens les plus forts commencent quand on peut être pleinement soi, sans jouer un rôle.</p>
+          </article>
+          <article class="feature">
+            <div class="icon" aria-hidden="true">✧</div>
+            <h3>Allez à votre rythme</h3>
+            <p>Pas besoin de tout précipiter. Prenez le temps de découvrir ce qui vous rapproche.</p>
+          </article>
+          <article class="feature">
+            <div class="icon" aria-hidden="true">☼</div>
+            <h3>Privilégiez l’essentiel</h3>
+            <p>Une écoute sincère et une conversation qui fait du bien valent bien plus qu’un simple profil.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap" id="commencer">
+      <div class="cta">
+        <span class="eyebrow">À vous de jouer</span>
+        <h2>Et si votre prochaine belle histoire commençait ici&nbsp;?</h2>
+        <p>Bienvenue chez You&amp;Me. Prenez votre temps, ouvrez la conversation et laissez la magie faire son chemin.</p>
+        <a class="button" href="#accueil">Revenir au début&nbsp; ↑</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-row">
+      <a class="logo" href="#accueil">You<span>&amp;</span>Me</a>
+      <p>© <span id="year">2026</span> You&amp;Me. Fait avec cœur.</p>
+    </div>
+  </footer>
+</body>
+</html>
