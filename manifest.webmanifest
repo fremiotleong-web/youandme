@@ -1,0 +1,19 @@
+{
+  "name": "You&Me",
+  "short_name": "You&Me",
+  "description": "Rencontres, conversations et communautés You&Me.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#171717",
+  "theme_color": "#e11d2e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -3,21 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#fff8f5">
+  <meta name="theme-color" content="#171717">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml" sizes="any">
+  <link rel="shortcut icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
   <meta name="description" content="You&Me — prenez le temps de créer une vraie connexion, à votre rythme.">
   <title>You&amp;Me — Les belles histoires commencent ici</title>
   <style>
     :root {
       color-scheme: light;
-      --ink: #302326;
-      --muted: #76666a;
-      --rose: #d86f78;
-      --rose-dark: #b94f5d;
-      --cream: #fff8f5;
-      --peach: #f9e4dc;
+      --ink: #171717;
+      --muted: #777;
+      --rose: #e11d2e;
+      --rose-dark: #b50e1d;
+      --cream: #f4f2f2;
+      --peach: #f4d7da;
       --white: #fff;
-      --line: #f0dfda;
-      --shadow: 0 24px 70px rgba(87, 47, 53, .12);
+      --line: #e3dcdc;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .16);
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -52,7 +59,7 @@
     .actions { display: flex; flex-wrap: wrap; gap: 13px; margin-top: 30px; }
     .note { margin-top: 18px; color: #958489; font-size: .85rem; }
     .art { position: relative; min-height: 440px; display: grid; place-items: center; }
-    .art-blob { position: absolute; width: min(420px, 90%); aspect-ratio: 1; border-radius: 47% 53% 62% 38% / 47% 40% 60% 53%; background: linear-gradient(145deg, #f8d4cd, #f5e1d3); transform: rotate(-8deg); }
+    .art-blob { position: absolute; width: min(420px, 90%); aspect-ratio: 1; border-radius: 47% 53% 62% 38% / 47% 40% 60% 53%; background: linear-gradient(145deg, #efc2c6, #d7d3d3); transform: rotate(-8deg); }
     .photo-card { position: relative; width: min(300px, 72%); min-height: 365px; display: flex; flex-direction: column; justify-content: end; overflow: hidden; padding: 25px; border: 9px solid rgba(255,255,255,.82); border-radius: 150px 150px 28px 28px; background: radial-gradient(circle at 50% 30%, #ffe9db 0 13%, transparent 13.5%), radial-gradient(ellipse at 50% 76%, #a95462 0 20%, transparent 20.5%), radial-gradient(ellipse at 35% 74%, #d99184 0 17%, transparent 17.5%), linear-gradient(150deg, #f5b5a9, #f7d8c8 48%, #e8a88f); box-shadow: var(--shadow); text-align: center; }
     .photo-card::before, .photo-card::after { position: absolute; top: 45px; width: 130px; height: 245px; border-radius: 90px 90px 20px 20px; content: ""; opacity: .8; }
     .photo-card::before { left: 18px; background: linear-gradient(#68454b 0 24%, #dca090 24% 100%); transform: rotate(-12deg); }
@@ -88,83 +95,757 @@
       section { padding: 58px 0; }
       .footer-row { flex-direction: column; align-items: flex-start; }
     }
-    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+
+    /* Social application */
+    header.app-header { position: sticky; top: 0; z-index: 20; padding: 10px 0; border-bottom: 1px solid #2a2a2a; background: rgba(23,23,23,.96); backdrop-filter: blur(14px); }
+    .app-header .logo { font-size: 1.25rem; color: white; }
+    .app-nav { display: flex; align-items: center; gap: 8px; }
+    .nav-icon { width: 44px; height: 44px; display: grid; place-items: center; border: 0; border-radius: 14px; background: transparent; color: var(--muted); cursor: pointer; font-size: 1.15rem; }
+    .nav-icon:hover, .nav-icon.active { background: var(--peach); color: var(--rose-dark); }
+    .app-shell { display: grid; grid-template-columns: 220px minmax(0, 620px) 280px; gap: 24px; align-items: start; padding: 28px 0 48px; }
+    .side-menu, .suggestions { position: sticky; top: 82px; }
+    .menu-button { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 48px; margin-bottom: 6px; padding: 0 14px; border: 0; border-radius: 14px; background: transparent; color: var(--muted); text-align: left; cursor: pointer; font-weight: 700; }
+    .menu-button:hover, .menu-button.active { background: var(--white); color: var(--ink); box-shadow: 0 8px 24px rgba(87,47,53,.07); }
+    .menu-button span:first-child { width: 24px; text-align: center; }
+    .view { display: none; }
+    .view.active { display: block; animation: reveal .25s ease-out; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(8px); } }
+    .stories { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 14px; }
+    .story { flex: 0 0 88px; text-align: center; cursor: pointer; }
+    .story-ring { width: 76px; height: 76px; display: grid; place-items: center; margin: auto; border: 2px solid var(--rose); border-radius: 50%; background: var(--white); font-size: 2rem; }
+    .story small { display: block; margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .composer, .post, .panel { border: 1px solid var(--line); border-radius: 18px; background: var(--white); }
+    .composer { display: flex; gap: 12px; padding: 16px; margin-bottom: 16px; }
+    .avatar { flex: 0 0 auto; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--peach); }
+    .composer input { flex: 1; min-width: 0; border: 0; outline: 0; background: #faf7f5; border-radius: 999px; padding: 0 18px; }
+    .composer button { border: 0; border-radius: 999px; background: var(--rose); color: white; padding: 0 16px; cursor: pointer; font-weight: 800; }
+    .post { margin-bottom: 16px; padding: 18px; }
+    .post-head { display: flex; align-items: center; gap: 10px; }
+    .post-head strong { display: block; }
+    .post-head small { color: var(--muted); }
+    .post-content { margin: 14px 0; line-height: 1.55; }
+    .post-actions { display: flex; border-top: 1px solid var(--line); padding-top: 10px; }
+    .post-action { flex: 1; min-height: 40px; border: 0; border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; }
+    .post-action:hover { background: var(--cream); }
+    .post-action.liked { color: var(--rose-dark); }
+    .reaction-wrap { position: relative; flex: 1; }
+    .reaction-wrap > .post-action { width: 100%; }
+    .reaction-picker { position: absolute; left: 50%; bottom: 48px; z-index: 10; display: flex; gap: 4px; padding: 7px; border: 1px solid var(--line); border-radius: 999px; background: white; box-shadow: 0 12px 30px rgba(0,0,0,.16); opacity: 0; pointer-events: none; transform: translate(-50%, 8px) scale(.95); transition: .16s ease; }
+    .reaction-wrap:hover .reaction-picker, .reaction-wrap.open .reaction-picker { opacity: 1; pointer-events: auto; transform: translate(-50%, 0) scale(1); }
+    .reaction-option { width: 42px; height: 42px; border: 0; border-radius: 50%; background: white; cursor: pointer; font-size: 1.35rem; transition: transform .12s; }
+    .reaction-option:hover { transform: translateY(-5px) scale(1.12); }
+    .suggestions .panel { padding: 16px; }
+    .suggestions h3 { margin: 0 0 12px; font-size: 1rem; }
+    .person { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .person .avatar { width: 38px; height: 38px; }
+    .person-info { min-width: 0; flex: 1; }
+    .person-info strong { display: block; font-size: .9rem; }
+    .person-info small { color: var(--muted); }
+    .follow { border: 0; border-radius: 999px; background: var(--peach); color: var(--rose-dark); min-height: 34px; padding: 0 12px; cursor: pointer; font-weight: 800; }
+    .discover-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .profile-card { overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: white; text-align: center; }
+    .profile-cover { height: 82px; background: linear-gradient(135deg, #171717 0 55%, #e11d2e 55% 100%); }
+    .profile-card .avatar { width: 74px; height: 74px; margin: -37px auto 8px; border: 4px solid white; font-size: 1.8rem; }
+    .profile-card h3 { margin: 5px 12px 2px; }
+    .profile-card p { margin: 0 12px 14px; color: var(--muted); font-size: .88rem; }
+    .profile-card .follow { margin-bottom: 14px; }
+    .chat-layout { height: 620px; display: grid; grid-template-columns: 230px 1fr; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: white; }
+    .chat-list { border-right: 1px solid var(--line); }
+    .chat-list h3 { margin: 0; padding: 16px; border-bottom: 1px solid var(--line); }
+    .chat-list-head { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .chat-list-head h3 { border: 0; }
+    .new-group-button { width: 38px; height: 38px; margin-right: 10px; border: 0; border-radius: 50%; background: var(--peach); color: var(--rose-dark); cursor: pointer; font-size: 1.1rem; }
+    .group-avatar { background: #171717; color: white; }
+    .live-post { border: 1px solid #ef9aa3; }
+    .live-label { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 10px; border-radius: 999px; background: var(--rose); color: white; padding: 5px 9px; font-size: .75rem; font-weight: 900; }
+    .live-label::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: white; animation: pulse 1.2s infinite; }
+    @keyframes pulse { 50% { opacity: .35; } }
+    .live-preview-feed { width: 100%; max-height: 360px; border-radius: 14px; background: #111; aspect-ratio: 16/9; object-fit: cover; }
+    .chat-person { width: 100%; display: flex; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid #f7efec; background: white; padding: 12px; text-align: left; cursor: pointer; }
+    .chat-person:hover, .chat-person.active { background: var(--cream); }
+    .chat-person .avatar { width: 38px; height: 38px; }
+    .chat-room { min-width: 0; display: grid; grid-template-rows: 64px 1fr 64px; }
+    .chat-header { display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); padding: 10px 14px; font-weight: 800; }
+    .messages { overflow-y: auto; padding: 16px; background: #fffdfb; }
+    .message { max-width: 78%; margin-bottom: 8px; padding: 9px 12px; border-radius: 14px 14px 14px 4px; background: #f1e8e5; }
+    .message.mine { margin-left: auto; border-radius: 14px 14px 4px 14px; background: var(--rose); color: white; }
+    .message-form { display: flex; gap: 8px; align-items: center; border-top: 1px solid var(--line); padding: 10px; }
+    .message-form input { flex: 1; min-width: 0; height: 44px; border: 0; border-radius: 999px; background: #faf7f5; padding: 0 15px; outline: 0; }
+    .message-form button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--rose); color: white; cursor: pointer; }
+    .modal { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; padding: 20px; background: rgba(48,35,38,.38); }
+    .modal.open { display: grid; }
+    .modal-card { width: min(420px, 100%); border-radius: 18px; background: white; padding: 22px; box-shadow: var(--shadow); }
+    .modal-card h2 { margin-top: 0; }
+    .modal-card input, .modal-card select { width: 100%; height: 48px; margin-bottom: 10px; border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; background: white; color: var(--ink); }
+    .modal-card .button { width: 100%; cursor: pointer; }
+    .checkbox-row { display: flex; align-items: flex-start; gap: 9px; margin: 6px 0 14px; color: var(--muted); font-size: .9rem; }
+    .checkbox-row input { width: 18px; height: 18px; flex: none; margin: 3px 0 0; }
+    .story-add { border: 2px dashed var(--rose); }
+    .live-preview, .story-preview { width: 100%; max-height: 420px; object-fit: cover; border-radius: 14px; background: #111; }
+    .live-preview { aspect-ratio: 16/10; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions .button { flex: 1; }
+    .protected-profile { -webkit-user-select: none; user-select: none; }
+    .search-box { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .search-box input { width: 100%; height: 48px; border: 1px solid var(--line); border-radius: 14px; background: white; padding: 0 16px; outline: 0; }
+    .search-box input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(225,29,46,.10); }
+    .install-button { display: none; }
+    .network-status { position: fixed; left: 50%; top: 74px; z-index: 40; padding: 8px 14px; border-radius: 999px; background: #171717; color: white; font-size: .82rem; font-weight: 800; transform: translate(-50%, -80px); transition: .25s; }
+    .network-status.show { transform: translate(-50%, 0); }
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 60; padding: 12px 16px; border-radius: 12px; background: var(--ink); color: white; opacity: 0; transform: translateY(12px); transition: .2s; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 980px) { .app-shell { grid-template-columns: 70px minmax(0, 620px) 240px; } .menu-button { justify-content: center; padding: 0; } .menu-button b { display: none; } }
+    @media (max-width: 760px) {
+      .app-shell { display: block; padding: 16px 0 84px; } .side-menu { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: grid; grid-template-columns: repeat(6, 1fr); padding: 8px 10px; border-top: 1px solid var(--line); background: white; } .menu-button { margin: 0; } .suggestions { display: none; } .discover-grid { grid-template-columns: 1fr 1fr; } .chat-layout { height: calc(100vh - 150px); grid-template-columns: 74px 1fr; } .chat-person { justify-content: center; } .chat-person div:last-child { display: none; } .app-header .nav-icon.profile-nav { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
   </style>
 </head>
 <body>
-  <header>
+  <header class="app-header">
     <nav class="nav wrap" aria-label="Navigation principale">
-      <a class="logo" href="#accueil" aria-label="You&Me, accueil">You<span>&amp;</span>Me</a>
-      <div class="nav-links">
-        <a href="#decouvrir">Notre approche</a>
-        <a href="#valeurs">Nos valeurs</a>
-        <a class="button" href="#commencer">Découvrir</a>
+      <a class="logo" href="#" aria-label="You&Me, accueil">You<span>&amp;</span>Me</a>
+      <div class="app-nav">
+        <button class="nav-icon" data-view="feed" aria-label="Accueil">⌂</button>
+        <button class="nav-icon" data-view="discover" aria-label="Découvrir">⌕</button>
+        <button class="nav-icon" data-view="chat" aria-label="Messages">◯</button>
+        <button class="nav-icon" id="liveButton" aria-label="Vidéo en direct">●</button>
+        <button class="nav-icon" id="notificationButton" aria-label="Activer les notifications">◌</button>
+        <button class="nav-icon install-button" id="installButton" aria-label="Installer l’application">↓</button>
+        <button class="nav-icon profile-nav" id="profileButton" aria-label="Mon profil">◉</button>
       </div>
     </nav>
   </header>
 
-  <main>
-    <section class="hero wrap" id="accueil">
-      <div>
-        <span class="eyebrow">♡ Une belle histoire, à votre rythme</span>
-        <h1>La vraie rencontre commence <em>par vous.</em></h1>
-        <p class="hero-copy">You&amp;Me vous invite à prendre le temps de découvrir l’autre, de partager ce qui compte et de créer une connexion sincère.</p>
-        <div class="actions">
-          <a class="button" href="#decouvrir">Découvrir You&amp;Me&nbsp; <span aria-hidden="true">→</span></a>
-          <a class="button secondary" href="#valeurs">Notre philosophie</a>
-        </div>
-        <p class="note">De belles conversations. Aucune précipitation.</p>
-      </div>
-      <div class="art" aria-label="Illustration de deux personnes qui se rapprochent" role="img">
-        <div class="art-blob"></div>
-        <div class="photo-card"><span class="card-label">Une connexion qui vous ressemble</span></div>
-        <div class="floating heart" aria-hidden="true">♥</div>
-        <div class="floating spark" aria-hidden="true">✦</div>
-      </div>
-    </section>
+  <main class="app-shell wrap">
+    <aside class="side-menu" aria-label="Menu">
+      <button class="menu-button active" data-view="feed"><span>⌂</span><b>Accueil</b></button>
+      <button class="menu-button" data-view="discover"><span>⌕</span><b>Découvrir</b></button>
+      <button class="menu-button" data-view="chat"><span>◯</span><b>Messages</b></button>
+      <button class="menu-button" id="liveMenu"><span>●</span><b>Live</b></button>
+      <button class="menu-button" id="profileMenu"><span>◉</span><b>Profil</b></button>
+      <button class="menu-button" id="loginMenu"><span>＋</span><b>Compte</b></button>
+    </aside>
 
-    <section id="decouvrir">
-      <div class="wrap">
-        <div class="section-heading">
-          <span class="eyebrow">Faire connaissance autrement</span>
-          <h2>Moins de pression.<br>Plus de connexion.</h2>
-          <p>Les plus belles histoires se construisent avec authenticité, curiosité et un peu de temps.</p>
-        </div>
-        <div class="features" id="valeurs">
-          <article class="feature">
-            <div class="icon" aria-hidden="true">♡</div>
-            <h3>Restez vous-même</h3>
-            <p>Les liens les plus forts commencent quand on peut être pleinement soi, sans jouer un rôle.</p>
-          </article>
-          <article class="feature">
-            <div class="icon" aria-hidden="true">✧</div>
-            <h3>Allez à votre rythme</h3>
-            <p>Pas besoin de tout précipiter. Prenez le temps de découvrir ce qui vous rapproche.</p>
-          </article>
-          <article class="feature">
-            <div class="icon" aria-hidden="true">☼</div>
-            <h3>Privilégiez l’essentiel</h3>
-            <p>Une écoute sincère et une conversation qui fait du bien valent bien plus qu’un simple profil.</p>
-          </article>
-        </div>
-      </div>
-    </section>
+    <div class="content">
+      <section class="view active" id="feedView">
+        <div class="stories" id="stories"></div>
+        <form class="composer" id="composer">
+          <div class="avatar" id="composerAvatar">U</div>
+          <input id="postInput" maxlength="280" placeholder="Quoi de neuf ?" aria-label="Créer une publication">
+          <button type="submit">Publier</button>
+        </form>
+        <div id="postList"></div>
+      </section>
 
-    <section class="wrap" id="commencer">
-      <div class="cta">
-        <span class="eyebrow">À vous de jouer</span>
-        <h2>Et si votre prochaine belle histoire commençait ici&nbsp;?</h2>
-        <p>Bienvenue chez You&amp;Me. Prenez votre temps, ouvrez la conversation et laissez la magie faire son chemin.</p>
-        <a class="button" href="#accueil">Revenir au début&nbsp; ↑</a>
+      <section class="view" id="discoverView">
+        <div class="search-box">
+          <input id="profileSearch" type="search" placeholder="Rechercher une personne" aria-label="Rechercher une personne">
+        </div>
+        <div class="section-heading" style="margin-bottom:24px">
+          <span class="eyebrow">Rencontrer de nouvelles personnes</span>
+          <h2>Découvrez les profils</h2>
+        </div>
+        <div class="discover-grid" id="discoverGrid"></div>
+      </section>
+
+      <section class="view" id="chatView">
+        <div class="chat-layout">
+          <aside class="chat-list">
+            <div class="chat-list-head">
+              <h3>Messages</h3>
+              <button class="new-group-button" id="newGroupButton" aria-label="Créer un groupe" title="Créer un groupe">＋</button>
+            </div>
+            <div id="chatList"></div>
+          </aside>
+          <div class="chat-room">
+            <div class="chat-header" id="chatHeader">Sélectionnez une conversation</div>
+            <div class="messages" id="messages"></div>
+            <form class="message-form" id="messageForm">
+              <input id="messageInput" maxlength="500" placeholder="Écrire un message…" autocomplete="off">
+              <button type="submit" aria-label="Envoyer">➤</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="suggestions">
+      <div class="panel">
+        <h3>Suggestions</h3>
+        <div id="suggestionsList"></div>
       </div>
-    </section>
+    </aside>
   </main>
 
-  <footer>
-    <div class="wrap footer-row">
-      <a class="logo" href="#accueil">You<span>&amp;</span>Me</a>
-      <p>© <span id="year">2026</span> You&amp;Me. Fait avec cœur.</p>
+  <div class="modal" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+    <form class="modal-card" id="accountForm">
+      <h2 id="accountTitle">Créer mon profil</h2>
+      <input id="accountName" maxlength="40" placeholder="Votre prénom" required>
+      <input id="accountPseudo" maxlength="40" placeholder="Votre pseudonyme">
+      <select id="accountGender" aria-label="Genre">
+        <option value="">Genre (facultatif)</option>
+        <option value="Homme">Homme</option>
+        <option value="Femme">Femme</option>
+        <option value="Autre">Autre</option>
+      </select>
+      <input id="accountBio" maxlength="120" placeholder="Une phrase qui vous ressemble">
+      <label class="checkbox-row">
+        <input id="accountLocked" type="checkbox">
+        <span>Verrouiller mon profil : les autres personnes verront moins d’informations.</span>
+      </label>
+      <button class="button" type="submit">Enregistrer</button>
+    </form>
+  </div>
+
+  <div class="modal" id="storyModal" role="dialog" aria-modal="true" aria-labelledby="storyTitle">
+    <form class="modal-card" id="storyForm">
+      <h2 id="storyTitle">Créer une story</h2>
+      <input id="storyText" maxlength="180" placeholder="Texte de votre story">
+      <input id="storyFile" type="file" accept="image/*" aria-label="Ajouter une photo">
+      <img id="storyPreview" class="story-preview" alt="Aperçu de la story" hidden>
+      <div class="modal-actions">
+        <button class="button" type="submit">Ajouter</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal" id="liveModal" role="dialog" aria-modal="true" aria-labelledby="liveTitle">
+    <div class="modal-card">
+      <h2 id="liveTitle">Vidéo en direct</h2>
+      <video id="livePreview" class="live-preview" autoplay muted playsinline></video>
+      <p id="liveStatus" style="color:var(--muted)">Votre caméra n’est pas encore activée.</p>
+      <div class="modal-actions">
+        <button class="button" id="startLive" type="button">Activer la caméra</button>
+        <button class="button secondary" id="stopLive" type="button">Arrêter</button>
+      </div>
     </div>
-  </footer>
+  </div>
+
+  <div class="modal" id="groupModal" role="dialog" aria-modal="true" aria-labelledby="groupTitle">
+    <form class="modal-card" id="groupForm">
+      <h2 id="groupTitle">Créer un groupe</h2>
+      <input id="groupName" maxlength="40" placeholder="Nom du groupe" required>
+      <div id="groupMembers" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 14px"></div>
+      <button class="button" type="submit">Créer le groupe</button>
+    </form>
+  </div>
+
+  <div class="network-status" id="networkStatus" role="status">Connexion rétablie</div>
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+    import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+    import { getFirestore, collection, doc, setDoc, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+    import { firebaseConfig } from './firebase-config.js';
+
+    let currentUser = null;
+    let firebaseReady = false;
+    let firebaseDb = null;
+    let firebaseAuth = null;
+
+    try {
+      const firebaseApp = initializeApp(firebaseConfig);
+      firebaseAuth = getAuth(firebaseApp);
+      firebaseDb = getFirestore(firebaseApp);
+      onAuthStateChanged(firebaseAuth, (user) => {
+        currentUser = user;
+        if (user && !firebaseReady) {
+          firebaseReady = true;
+          startFirebaseSync();
+        }
+      });
+      signInAnonymously(firebaseAuth).catch((error) => {
+        console.warn('Firebase non disponible:', error.message);
+      });
+    } catch (error) {
+      firebaseReady = false;
+      console.warn('Firebase non disponible:', error.message);
+    }
+
+    const storage = {
+      get(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
+      set(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+    };
+
+    const people = [
+      { id: 'lea', name: 'Léa', age: 24, bio: 'Photographie, voyages et bons cafés.', avatar: 'L' },
+      { id: 'nora', name: 'Nora', age: 26, bio: 'Musique, cinéma et longues conversations.', avatar: 'N' },
+      { id: 'maelle', name: 'Maëlle', age: 23, bio: 'Créative, curieuse et toujours partante.', avatar: 'M' },
+      { id: 'ines', name: 'Inès', age: 27, bio: 'Randonnée, cuisine et belles rencontres.', avatar: 'I' },
+      { id: 'thomas', name: 'Thomas', age: 29, bio: 'Sport, cuisine et sorties culturelles.', avatar: 'T' },
+      { id: 'yohan', name: 'Yohan', age: 25, bio: 'Musique live, voyage et nouvelles rencontres.', avatar: 'Y' }
+    ];
+
+    let account = storage.get('youandme-account', { name: 'Vous', bio: 'Bienvenue sur You&Me', avatar: 'V' });
+    let posts = storage.get('youandme-posts', [
+      { id: 'p1', author: 'Léa', avatar: 'L', text: 'Premier rayon de soleil de la journée, envie de prendre le temps de profiter. ☀️', time: 'Il y a 12 min', likes: 18, reaction: null },
+      { id: 'p2', author: 'Nora', avatar: 'N', text: 'Quel est le petit bonheur qui a rendu votre semaine meilleure ?', time: 'Il y a 38 min', likes: 9, reaction: null }
+    ]);
+    let activeChat = 'lea';
+    let unsubscribeActiveChat = null;
+
+    const $ = (selector) => document.querySelector(selector);
+
+    function switchView(name) {
+      document.querySelectorAll('.view').forEach((view) => view.classList.remove('active'));
+      document.querySelectorAll('[data-view]').forEach((button) => button.classList.toggle('active', button.dataset.view === name));
+      $(`#${name}View`).classList.add('active');
+      if (name === 'chat') scrollMessages();
+    }
+
+    function toast(message) {
+      const element = $('#toast');
+      element.textContent = message;
+      element.classList.add('show');
+      setTimeout(() => element.classList.remove('show'), 2200);
+    }
+
+    function renderAccount() {
+      $('#composerAvatar').textContent = account.avatar;
+      $('#accountName').value = account.name === 'Vous' ? '' : account.name;
+      $('#accountPseudo').value = account.pseudo || '';
+      $('#accountGender').value = account.gender || '';
+      $('#accountBio').value = account.bio;
+      $('#accountLocked').checked = Boolean(account.locked);
+    }
+
+    function renderStories() {
+      let ownStories = storage.get('youandme-stories', []);
+      const ownButtons = ownStories.length ? ownStories.map((story, index) => `
+        <button class="story" data-own-story="${index}" style="border:0;background:none">
+          <div class="story-ring">${story.preview ? '▣' : '＋'}</div><small>Ma story</small>
+        </button>`).join('') : '';
+      $('#stories').innerHTML = `
+        <button class="story" id="addStory" style="border:0;background:none">
+          <div class="story-ring story-add">＋</div><small>Ajouter</small>
+        </button>${ownButtons}${people.map((person) => `
+        <button class="story protected-profile" data-story="${person.name}" style="border:0;background:none">
+          <div class="story-ring">${person.avatar}</div><small>${person.name}</small>
+        </button>`).join('')}`;
+    }
+
+    function renderPosts() {
+      const reactions = [
+        { id: 'like', emoji: '👍', label: 'J’aime' },
+        { id: 'love', emoji: '❤️', label: 'J’adore' },
+        { id: 'haha', emoji: '😂', label: 'Haha' },
+        { id: 'wow', emoji: '😮', label: 'Waouh' },
+        { id: 'sad', emoji: '😢', label: 'Triste' },
+        { id: 'support', emoji: '🤗', label: 'Solidaire' }
+      ];
+      $('#postList').innerHTML = posts.map((post) => {
+        const activeReaction = reactions.find((reaction) => reaction.id === post.reaction);
+        const reactionLabel = activeReaction ? `${activeReaction.emoji} ${activeReaction.label}` : 'J’aime';
+        return `
+        <article class="post ${post.live ? 'live-post' : ''}">
+          <div class="post-head"><div class="avatar">${post.avatar}</div><div><strong>${escapeHtml(post.author)}</strong><small>${post.time}</small></div></div>
+          ${post.live ? '<span class="live-label">EN DIRECT</span>' : ''}
+          ${post.live ? '<video class="live-preview-feed" autoplay muted playsinline></video>' : ''}
+          <p class="post-content">${escapeHtml(post.text)}</p>
+          <div class="post-actions">
+            <div class="reaction-wrap" data-reaction-wrap="${post.id}">
+              <button class="post-action ${post.reaction ? 'liked' : ''}" data-reaction-menu="${post.id}">${reactionLabel} · ${post.likes}</button>
+              <div class="reaction-picker" aria-label="Choisir une réaction">
+                ${reactions.map((reaction) => `<button class="reaction-option" data-reaction="${reaction.id}" data-post="${post.id}" title="${reaction.label}" aria-label="${reaction.label}">${reaction.emoji}</button>`).join('')}
+              </div>
+            </div>
+            <button class="post-action" data-comment="${post.id}">◯ Commenter</button>
+            <button class="post-action" data-share="${post.id}">↗ Partager</button>
+          </div>
+        </article>`;
+      }).join('');
+      if (liveStream) {
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.live-preview-feed').forEach((video) => {
+            video.srcObject = liveStream;
+          });
+        });
+      }
+    }
+
+    function renderProfiles() {
+      const cards = people.map((person) => `
+        <article class="profile-card protected-profile">
+          <div class="profile-cover"></div><div class="avatar">${person.avatar}</div>
+          <h3>${person.name}, ${person.age}</h3><p>${person.bio}</p>
+          <button class="follow" data-follow="${person.id}">Suivre</button>
+        </article>`).join('');
+      $('#discoverGrid').innerHTML = cards;
+      $('#suggestionsList').innerHTML = people.slice(0, 3).map((person) => `
+        <div class="person"><div class="avatar">${person.avatar}</div><div class="person-info"><strong>${person.name}</strong><small>${person.bio}</small></div><button class="follow" data-follow="${person.id}">＋</button></div>`).join('');
+    }
+
+    function renderChatList() {
+      const groups = storage.get('youandme-groups', []);
+      const groupItems = groups.map((group) => `
+        <button class="chat-person ${activeChat === group.id ? 'active' : ''}" data-chat="${group.id}">
+          <div class="avatar group-avatar">${group.name.charAt(0).toUpperCase()}</div>
+          <div><strong>${escapeHtml(group.name)}</strong><br><small>${group.members.length} membres</small></div>
+        </button>`).join('');
+      const peopleItems = people.map((person) => `
+        <button class="chat-person ${person.id === activeChat ? 'active' : ''}" data-chat="${person.id}"><div class="avatar">${person.avatar}</div><div><strong>${person.name}</strong><br><small>Voir la conversation</small></div></button>`).join('');
+      $('#chatList').innerHTML = groupItems + peopleItems;
+    }
+
+    function getConversation(id) {
+      return storage.get(`youandme-chat-${id}`, id === 'lea' ? [{ mine: false, text: 'Salut ! Heureuse de te rencontrer ici.' }] : []);
+    }
+
+    function renderMessages() {
+      const group = storage.get('youandme-groups', []).find((item) => item.id === activeChat);
+      const person = people.find((item) => item.id === activeChat);
+      if (!group && !person) return;
+      const chatName = group ? group.name : person.name;
+      const chatAvatar = group ? chatName.charAt(0).toUpperCase() : person.avatar;
+      const myDisplayName = account.pseudo || account.name;
+      $('#chatHeader').innerHTML = `<div class="avatar ${group ? 'group-avatar' : ''}">${chatAvatar}</div><span>${chatName}<small style="display:block;color:var(--muted);font-weight:600">Vous discutez sous « ${escapeHtml(myDisplayName)} »</small></span>`;
+      $('#messages').innerHTML = getConversation(activeChat).map((message) => `
+        <div class="message ${message.mine ? 'mine' : ''}"><small style="display:block;opacity:.75;font-weight:800">${escapeHtml(message.mine ? myDisplayName : person?.name || 'Membre du groupe')}</small>${escapeHtml(message.text)}</div>
+      `).join('');
+      scrollMessages();
+    }
+
+    function scrollMessages() { requestAnimationFrame(() => { $('#messages').scrollTop = $('#messages').scrollHeight; }); }
+
+    function escapeHtml(value) {
+      const element = document.createElement('div');
+      element.textContent = value;
+      return element.innerHTML;
+    }
+
+    document.addEventListener('click', (event) => {
+      const viewButton = event.target.closest('[data-view]');
+      if (viewButton) switchView(viewButton.dataset.view);
+      const reactionMenu = event.target.closest('[data-reaction-menu]');
+      if (reactionMenu) {
+        document.querySelectorAll('[data-reaction-wrap]').forEach((wrap) => {
+          if (wrap.dataset.reactionWrap !== reactionMenu.dataset.reactionMenu) wrap.classList.remove('open');
+        });
+        reactionMenu.closest('[data-reaction-wrap]').classList.toggle('open');
+      }
+      const reactionOption = event.target.closest('[data-reaction]');
+      if (reactionOption) {
+        const post = posts.find((item) => item.id === reactionOption.dataset.post);
+        if (post.reaction !== reactionOption.dataset.reaction) {
+          if (!post.reaction) post.likes++;
+          post.reaction = reactionOption.dataset.reaction;
+          storage.set('youandme-posts', posts);
+          renderPosts();
+          toast('Réaction ajoutée');
+        }
+      }
+      const followButton = event.target.closest('[data-follow]');
+      if (followButton) { followButton.textContent = followButton.textContent.includes('Suivre') ? 'Suivi' : 'Abonné'; toast('Profil suivi'); }
+      const chatButton = event.target.closest('[data-chat]');
+      if (chatButton) {
+        activeChat = chatButton.dataset.chat;
+        renderChatList();
+        renderMessages();
+        unsubscribeActiveChat?.();
+        unsubscribeActiveChat = null;
+        if (firebaseReady) {
+          const chatId = activeChat;
+          unsubscribeActiveChat = onSnapshot(collection(firebaseDb, 'conversations', chatId, 'messages'), (snapshot) => {
+            const cloudMessages = snapshot.docs
+              .map((item) => item.data())
+              .sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+            if (cloudMessages.length) {
+              storage.set(`youandme-chat-${chatId}`, cloudMessages.map((message) => ({ mine: message.uid === currentUser?.uid, sender: message.sender, text: message.text })));
+              if (activeChat === chatId) renderMessages();
+            }
+          }, (error) => console.warn('Synchronisation de la conversation impossible:', error.message));
+        }
+      }
+      const shareButton = event.target.closest('[data-share]');
+      if (shareButton) { navigator.clipboard?.writeText(location.href); toast('Lien copié'); }
+      const commentButton = event.target.closest('[data-comment]');
+      if (commentButton) { switchView('chat'); toast('Commencez une conversation'); }
+      const storyButton = event.target.closest('[data-story]');
+      if (storyButton) toast(`Story de ${storyButton.dataset.story}`);
+    });
+
+    $('#composer').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const input = $('#postInput');
+      const text = input.value.trim();
+      if (!text) return;
+      posts.unshift({ id: `p${Date.now()}`, author: account.pseudo || account.name, avatar: account.avatar, text, time: "À l'instant", likes: 0, reaction: null });
+      storage.set('youandme-posts', posts);
+      if (firebaseReady && currentUser) {
+        try {
+          await addDoc(collection(firebaseDb, 'posts'), { author: account.pseudo || account.name, avatar: account.avatar, text, likes: 0, reaction: null, uid: currentUser.uid, createdAt: serverTimestamp() });
+        } catch (error) {
+          toast('Publication locale enregistrée');
+        }
+      }
+      input.value = '';
+      renderPosts();
+      toast('Publication ajoutée');
+    });
+
+    $('#messageForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const input = $('#messageInput');
+      const text = input.value.trim();
+      if (!text) return;
+      const conversation = getConversation(activeChat);
+      conversation.push({ mine: true, sender: account.pseudo || account.name, text });
+      storage.set(`youandme-chat-${activeChat}`, conversation);
+      if (firebaseReady && currentUser) {
+        try {
+          await addDoc(collection(firebaseDb, 'conversations', activeChat, 'messages'), { sender: account.pseudo || account.name, text, uid: currentUser.uid, createdAt: serverTimestamp() });
+        } catch (error) {
+          console.warn('Message enregistré localement:', error.message);
+        }
+      }
+      input.value = '';
+      renderMessages();
+    });
+
+    $('#accountForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = $('#accountName').value.trim();
+      if (!name) return;
+      account = { name, pseudo: $('#accountPseudo').value.trim(), gender: $('#accountGender').value, locked: $('#accountLocked').checked, bio: $('#accountBio').value.trim() || 'Bienvenue sur You&Me', avatar: ( $('#accountPseudo').value.trim() || name).charAt(0).toUpperCase() };
+      storage.set('youandme-account', account);
+      if (firebaseReady && currentUser) {
+        try {
+          await setDoc(doc(firebaseDb, 'profiles', currentUser.uid), { ...account, uid: currentUser.uid, updatedAt: serverTimestamp() }, { merge: true });
+        } catch (error) {
+          console.warn('Profil enregistré localement:', error.message);
+        }
+      }
+      renderAccount();
+      $('#accountModal').classList.remove('open');
+      toast('Profil enregistré');
+    });
+
+    $('#loginMenu').addEventListener('click', () => $('#accountModal').classList.add('open'));
+    $('#profileButton').addEventListener('click', () => $('#accountModal').classList.add('open'));
+    $('#profileMenu').addEventListener('click', () => $('#accountModal').classList.add('open'));
+    $('#accountModal').addEventListener('click', (event) => { if (event.target === $('#accountModal')) event.currentTarget.classList.remove('open'); });
+
+    const groupModal = $('#groupModal');
+    $('#newGroupButton').addEventListener('click', () => {
+      $('#groupMembers').innerHTML = people.map((person) => `<label class="checkbox-row"><input type="checkbox" name="groupMember" value="${person.id}"><span>${person.name}</span></label>`).join('');
+      groupModal.classList.add('open');
+    });
+    groupModal.addEventListener('click', (event) => { if (event.target === groupModal) groupModal.classList.remove('open'); });
+    $('#groupForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const name = $('#groupName').value.trim();
+      const members = [...document.querySelectorAll('input[name="groupMember"]:checked')].map((input) => input.value);
+      if (!name) return;
+      if (!members.length) {
+        toast('Sélectionnez au moins une personne');
+        return;
+      }
+      const groups = storage.get('youandme-groups', []);
+      const group = { id: `group-${Date.now()}`, name, members };
+      groups.unshift(group);
+      storage.set('youandme-groups', groups);
+      if (firebaseReady) {
+        try {
+          await setDoc(doc(firebaseDb, 'groups', group.id), { ...group, ownerUid: currentUser?.uid || null, createdAt: serverTimestamp() });
+        } catch (error) {
+          console.warn('Groupe enregistré localement:', error.message);
+        }
+      }
+      storage.set(`youandme-chat-${group.id}`, []);
+      activeChat = group.id;
+      $('#groupForm').reset();
+      groupModal.classList.remove('open');
+      renderChatList();
+      renderMessages();
+      toast('Groupe créé');
+    });
+
+    const storyModal = $('#storyModal');
+    const liveModal = $('#liveModal');
+    let liveStream = null;
+
+    $('#storyFile').addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        $('#storyPreview').src = reader.result;
+        $('#storyPreview').hidden = false;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    $('#storyForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const text = $('#storyText').value.trim();
+      const preview = $('#storyPreview').hidden ? '' : $('#storyPreview').src;
+      if (!text && !preview) return;
+      const stories = storage.get('youandme-stories', []);
+      stories.unshift({ text, preview, time: Date.now() });
+      storage.set('youandme-stories', stories.slice(0, 10));
+      storyModal.classList.remove('open');
+      $('#storyForm').reset();
+      $('#storyPreview').hidden = true;
+      renderStories();
+      toast('Story publiée');
+    });
+
+    $('#liveButton').addEventListener('click', () => liveModal.classList.add('open'));
+    $('#liveMenu').addEventListener('click', () => liveModal.classList.add('open'));
+
+    $('#startLive').addEventListener('click', async () => {
+      try {
+        liveStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        $('#livePreview').srcObject = liveStream;
+        $('#liveStatus').textContent = 'Caméra activée — diffusion locale prête.';
+      const livePost = {
+        id: `live-${Date.now()}`,
+        author: account.pseudo || account.name,
+        avatar: account.avatar,
+        text: 'Mon direct est maintenant lancé.',
+        time: 'À l’instant',
+        likes: 0,
+        reaction: null,
+        live: true
+      };
+      if (!posts.some((post) => post.live)) {
+        posts.unshift(livePost);
+        storage.set('youandme-posts', posts);
+        renderPosts();
+      }
+        toast('Caméra activée');
+      } catch (error) {
+        $('#liveStatus').textContent = 'Accès à la caméra refusé ou indisponible.';
+      }
+    });
+
+    $('#stopLive').addEventListener('click', () => {
+      if (liveStream) liveStream.getTracks().forEach((track) => track.stop());
+      liveStream = null;
+      $('#livePreview').srcObject = null;
+      $('#liveStatus').textContent = 'Diffusion arrêtée.';
+      posts = posts.filter((post) => !post.live);
+      storage.set('youandme-posts', posts);
+      renderPosts();
+    });
+
+    [storyModal, liveModal].forEach((modal) => modal.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.classList.remove('open');
+        if (modal === liveModal) $('#stopLive').click();
+      }
+    }));
+
+    document.addEventListener('click', (event) => {
+      if (event.target.closest('#addStory')) storyModal.classList.add('open');
+      const ownStory = event.target.closest('[data-own-story]');
+      if (ownStory) {
+        const stories = storage.get('youandme-stories', []);
+        toast(stories[Number(ownStory.dataset.ownStory)]?.text || 'Votre story');
+      }
+    });
+
+    document.addEventListener('contextmenu', (event) => {
+      if (event.target.closest('.protected-profile')) event.preventDefault();
+    });
+    document.addEventListener('dragstart', (event) => {
+      if (event.target.closest('.protected-profile')) event.preventDefault();
+    });
+
+    let deferredInstallPrompt = null;
+    const installButton = $('#installButton');
+
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      installButton.style.display = 'grid';
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (!deferredInstallPrompt) {
+        toast('Utilisez le menu du navigateur pour installer You&Me');
+        return;
+      }
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      installButton.style.display = 'none';
+    });
+
+    $('#profileSearch').addEventListener('input', (event) => {
+      const query = event.target.value.trim().toLowerCase();
+      document.querySelectorAll('.profile-card').forEach((card) => {
+        card.hidden = query !== '' && !card.textContent.toLowerCase().includes(query);
+      });
+    });
+
+    function showNetworkStatus(message) {
+      const status = $('#networkStatus');
+      status.textContent = message;
+      status.classList.add('show');
+      setTimeout(() => status.classList.remove('show'), 2600);
+    }
+
+    window.addEventListener('offline', () => showNetworkStatus('Mode hors connexion'));
+    window.addEventListener('online', () => showNetworkStatus('Connexion rétablie'));
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        event.preventDefault();
+        switchView('discover');
+        $('#profileSearch').focus();
+      }
+      if (event.key === 'Escape') {
+        document.querySelectorAll('.modal.open').forEach((modal) => modal.classList.remove('open'));
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        switchView('chat');
+        $('#messageInput').focus();
+      }
+    });
+
+    $('#notificationButton').addEventListener('click', async () => {
+      if (!('Notification' in window)) {
+        toast('Notifications non prises en charge');
+        return;
+      }
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        new Notification('You&Me', { body: 'Les notifications sont activées.', icon: './icon.svg' });
+        toast('Notifications activées');
+      } else {
+        toast('Notifications refusées');
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    function startFirebaseSync() {
+      onSnapshot(query(collection(firebaseDb, 'posts'), orderBy('createdAt', 'desc')), (snapshot) => {
+        const cloudPosts = snapshot.docs.map((item) => ({ id: item.id, ...item.data(), time: "À l'instant" }));
+        if (cloudPosts.length) {
+          posts = cloudPosts;
+          renderPosts();
+        }
+      }, (error) => console.warn('Synchronisation des publications impossible:', error.message));
+
+      onSnapshot(collection(firebaseDb, 'groups'), (snapshot) => {
+        const cloudGroups = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+        if (cloudGroups.length) {
+          storage.set('youandme-groups', cloudGroups);
+          renderChatList();
+        }
+      }, (error) => console.warn('Synchronisation des groupes impossible:', error.message));
+    }
+
+    renderAccount(); renderStories(); renderPosts(); renderProfiles(); renderChatList(); renderMessages();
+  </script>
 </body>
 </html>
